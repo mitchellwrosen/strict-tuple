@@ -1,18 +1,19 @@
-{-# language GeneralizedNewtypeDeriving, StrictData #-}
+{-# language DeriveGeneric, GeneralizedNewtypeDeriving, StrictData #-}
 
 -- | Strict tuples.
 
 module Data.Tuple.Strict where
 
 import Data.Semigroup
+import GHC.Generics (Generic)
 
 newtype T1 a
   = T1 a
-  deriving (Bounded, Eq, Monoid, Ord, Read, Semigroup, Show)
+  deriving (Bounded, Eq, Generic, Monoid, Ord, Read, Semigroup, Show)
 
 data T2 a b
   = T2 a b
-  deriving (Bounded, Eq, Ord, Read, Show)
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b) => Monoid (T2 a b) where
   mempty = T2 mempty mempty
@@ -23,6 +24,7 @@ instance (Semigroup a, Semigroup b) => Semigroup (T2 a b) where
 
 data T3 a b c
   = T3 a b c
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c) => Monoid (T3 a b c) where
   mempty = T3 mempty mempty mempty
@@ -33,6 +35,7 @@ instance (Semigroup a, Semigroup b, Semigroup c) => Semigroup (T3 a b c) where
 
 data T4 a b c d
   = T4 a b c d
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d) => Monoid (T4 a b c d) where
   mempty = T4 mempty mempty mempty mempty
@@ -43,6 +46,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d) => Semigroup (T4 a
 
 data T5 a b c d e
   = T5 a b c d e
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e) => Monoid (T5 a b c d e) where
   mempty = T5 mempty mempty mempty mempty mempty
@@ -53,6 +57,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e) => Se
 
 data T6 a b c d e f
   = T6 a b c d e f
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f) => Monoid (T6 a b c d e f) where
   mempty = T6 mempty mempty mempty mempty mempty mempty
@@ -63,6 +68,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T7 a b c d e f g
   = T7 a b c d e f g
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g) => Monoid (T7 a b c d e f g) where
   mempty = T7 mempty mempty mempty mempty mempty mempty mempty
@@ -73,6 +79,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T8 a b c d e f g h
   = T8 a b c d e f g h
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h) => Monoid (T8 a b c d e f g h) where
   mempty = T8 mempty mempty mempty mempty mempty mempty mempty mempty
@@ -83,6 +90,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T9 a b c d e f g h i
   = T9 a b c d e f g h i
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i) => Monoid (T9 a b c d e f g h i) where
   mempty = T9 mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -93,6 +101,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T10 a b c d e f g h i j
   = T10 a b c d e f g h i j
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j) => Monoid (T10 a b c d e f g h i j) where
   mempty = T10 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -103,6 +112,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T11 a b c d e f g h i j k
   = T11 a b c d e f g h i j k
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k) => Monoid (T11 a b c d e f g h i j k) where
   mempty = T11 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -113,6 +123,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T12 a b c d e f g h i j k l
   = T12 a b c d e f g h i j k l
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l) => Monoid (T12 a b c d e f g h i j k l) where
   mempty = T12 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -123,6 +134,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T13 a b c d e f g h i j k l m
   = T13 a b c d e f g h i j k l m
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m) => Monoid (T13 a b c d e f g h i j k l m) where
   mempty = T13 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -133,6 +145,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T14 a b c d e f g h i j k l m n
   = T14 a b c d e f g h i j k l m n
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n) => Monoid (T14 a b c d e f g h i j k l m n) where
   mempty = T14 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -143,6 +156,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T15 a b c d e f g h i j k l m n o
   = T15 a b c d e f g h i j k l m n o
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o) => Monoid (T15 a b c d e f g h i j k l m n o) where
   mempty = T15 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -153,6 +167,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T16 a b c d e f g h i j k l m n o p
   = T16 a b c d e f g h i j k l m n o p
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p) => Monoid (T16 a b c d e f g h i j k l m n o p) where
   mempty = T16 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -163,6 +178,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T17 a b c d e f g h i j k l m n o p q
   = T17 a b c d e f g h i j k l m n o p q
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q) => Monoid (T17 a b c d e f g h i j k l m n o p q) where
   mempty = T17 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -173,6 +189,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T18 a b c d e f g h i j k l m n o p q r
   = T18 a b c d e f g h i j k l m n o p q r
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r) => Monoid (T18 a b c d e f g h i j k l m n o p q r) where
   mempty = T18 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
@@ -183,6 +200,7 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
 
 data T19 a b c d e f g h i j k l m n o p q r s
   = T19 a b c d e f g h i j k l m n o p q r s
+  deriving (Bounded, Eq, Generic, Ord, Read, Show)
 
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r, Monoid s) => Monoid (T19 a b c d e f g h i j k l m n o p q r s) where
   mempty = T19 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
