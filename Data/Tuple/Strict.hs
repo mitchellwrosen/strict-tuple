@@ -1,5 +1,7 @@
 {-# language GeneralizedNewtypeDeriving, StrictData #-}
 
+-- | Strict tuples.
+
 module Data.Tuple.Strict where
 
 import Data.Semigroup
