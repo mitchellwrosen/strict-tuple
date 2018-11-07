@@ -33,3 +33,5 @@ library
     Data.Tuple.Strict
   ghc-options:
     -Wall
+  hs-source-dirs:
+    src
