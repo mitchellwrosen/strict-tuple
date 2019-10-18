@@ -1,23 +1,61 @@
-{-# LANGUAGE DeriveGeneric, GeneralizedNewtypeDeriving, StrictData #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StrictData #-}
 
 -- | Strict tuples.
 
 module Data.Tuple.Strict where
 
+
 import Control.DeepSeq (NFData, rnf, rwhnf)
+
+import Data.Biapplicative
+import Data.Bifoldable
+import Data.Bitraversable
 import Data.Hashable (Hashable, hash, hashWithSalt)
 import Data.Hashable.Lifted (Hashable1, Hashable2, defaultLiftHashWithSalt,
                              hashWithSalt1, liftHashWithSalt, liftHashWithSalt2)
 import Data.Semigroup
+
 import GHC.Generics (Generic)
+
 
 newtype T1 a
   = T1 a
-  deriving (Bounded, Eq, Generic, Hashable, Monoid, NFData, Ord, Read, Semigroup, Show)
+  deriving
+    ( Bounded, Eq, Ord, Show, Read
+    , Generic, NFData, Hashable
+    , Monoid, Semigroup
+    , Functor, Foldable, Traversable
+    )
+
+instance Applicative T1 where
+  pure = T1
+  T1 f <*> T1 a = T1 (f a)
+
+instance Monad T1 where
+  return = pure
+  T1 a >>= f = f a
 
 data T2 a b
   = T2 a b
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance Monoid a => Applicative (T2 a) where
+  pure b = T2 mempty b
+  T2 a f <*> T2 a' b = T2 (a <> a') (f b)
+
+instance Monoid a => Monad (T2 a) where
+  return = pure
+  T2 a b >>= f = case f b of
+    T2 a' b' -> T2 (a <> a') b'
 
 instance (Hashable a, Hashable b) => Hashable (T2 a b) where
   hash (T2 a b) = hash a `hashWithSalt` b
@@ -39,9 +77,60 @@ instance (Semigroup a, Semigroup b) => Semigroup (T2 a b) where
   T2 a1 b1 <> T2 a2 b2 = T2 (a1 <> a2) (b1 <> b2)
   stimes ii (T2 a b) = T2 (stimes ii a) (stimes ii b)
 
+instance Bifunctor T2 where
+  bimap f g (T2 a b) = T2 (f a) (g b)
+
+instance Biapplicative T2 where
+  bipure = T2
+  T2 f g <<*>> T2 a b = T2 (f a) (g b)
+
+instance Bifoldable T2 where
+  bifoldMap f g (T2 a b) = f a <> g b
+
+instance Bitraversable T2 where
+  bitraverse f g (T2 a b) = T2 <$> f a <*> g b
+
+-- | A strict, 'T2'-based analog to 'fst'
+--
+sfst :: T2 a b -> a
+sfst (T2 a _) = a
+
+-- | A strict, 'T2'-based analog to 'snd'
+--
+ssnd :: T2 a b -> b
+ssnd (T2 _ b) = b
+
+-- | A strict, 'T2'-based analog to 'curry'
+--
+scurry :: (T2 a b -> c) -> a -> b -> c
+scurry f a b = f (T2 a b)
+
+-- | A strict, 'T2'-based analog to 'uncurry'
+--
+suncurry :: (a -> b -> c) -> T2 a b -> c
+suncurry f (T2 a b) = f a b
+
+-- | A strict, 'T2'-based analog to 'swap'
+--
+sswap :: T2 a b -> T2 b a
+sswap (T2 a b) = T2 b a
+
 data T3 a b c
   = T3 a b c
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b) => Applicative (T3 a b) where
+  pure c = T3 mempty mempty c
+  T3 a b f <*> T3 a' b' c = T3 (a <> a') (b <> b') (f c)
+
+instance (Monoid a, Monoid b) => Monad (T3 a b) where
+  return = pure
+  T3 a b c >>= f = case f c of
+    T3 a' b' c' -> T3 (a <> a') (b <> b') c'
 
 instance (Hashable a, Hashable b, Hashable c) => Hashable (T3 a b c) where
   hash (T3 a b c) = hash a `hashWithSalt` b `hashWithSalt` c
@@ -64,9 +153,31 @@ instance (Semigroup a, Semigroup b, Semigroup c) => Semigroup (T3 a b c) where
   T3 a1 b1 c1 <> T3 a2 b2 c2 = T3 (a1 <> a2) (b1 <> b2) (c1 <> c2)
   stimes ii (T3 a b c) = T3 (stimes ii a) (stimes ii b) (stimes ii c)
 
+instance Bifunctor (T3 x) where
+  bimap f g (T3 x a b) = T3 x (f a) (g b)
+
+instance Bifoldable (T3 x) where
+  bifoldMap f g (T3 _ a b) = f a <> g b
+
+instance Bitraversable (T3 x) where
+  bitraverse f g (T3 x a b) = T3 x <$> f a <*> g b
+
 data T4 a b c d
   = T4 a b c d
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c) => Applicative (T4 a b c) where
+  pure d = T4 mempty mempty mempty d
+  T4 a b c f <*> T4 a' b' c' d = T4 (a <> a') (b <> b') (c <> c') (f d)
+
+instance (Monoid a, Monoid b, Monoid c) => Monad (T4 a b c) where
+  return = pure
+  T4 a b c d >>= f = case f d of
+    T4 a' b' c' d' -> T4 (a <> a') (b <> b') (c <> c') d'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d) => Hashable (T4 a b c d) where
   hash (T4 a b c d) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d
@@ -89,9 +200,31 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d) => Semigroup (T4 a
   T4 a1 b1 c1 d1 <> T4 a2 b2 c2 d2 = T4 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2)
   stimes ii (T4 a b c d) = T4 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d)
 
+instance Bifunctor (T4 x y) where
+  bimap f g (T4 x y a b) = T4 x y (f a) (g b)
+
+instance Bifoldable (T4 x y) where
+  bifoldMap f g (T4 _ _ a b) = f a <> g b
+
+instance Bitraversable (T4 x y) where
+  bitraverse f g (T4 x y a b) = T4 x y <$> f a <*> g b
+
 data T5 a b c d e
   = T5 a b c d e
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d) => Applicative (T5 a b c d) where
+  pure e = T5 mempty mempty mempty mempty e
+  T5 a b c d f <*> T5 a' b' c' d' e = T5 (a <> a') (b <> b') (c <> c') (d <> d') (f e)
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d) => Monad (T5 a b c d) where
+  return = pure
+  T5 a b c d e >>= f = case f e of
+    T5 a' b' c' d' e' -> T5 (a <> a') (b <> b') (c <> c') (d <> d') e'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e) => Hashable (T5 a b c d e) where
   hash (T5 a b c d e) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e
@@ -114,9 +247,32 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e) => Se
   T5 a1 b1 c1 d1 e1 <> T5 a2 b2 c2 d2 e2 = T5 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2)
   stimes ii (T5 a b c d e) = T5 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e)
 
+instance Bifunctor (T5 x y z) where
+  bimap f g (T5 x y z a b) = T5 x y z (f a) (g b)
+
+instance Bifoldable (T5 x y z) where
+  bifoldMap f g (T5 _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T5 x y z) where
+  bitraverse f g (T5 x y z a b) = T5 x y z <$> f a <*> g b
+
 data T6 a b c d e f
   = T6 a b c d e f
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e) => Applicative (T6 a b c d e) where
+  pure f = T6 mempty mempty mempty mempty mempty f
+  T6 a b c d e f <*> T6 a' b' c' d' e' f' =
+    T6 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f f')
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e) => Monad (T6 a b c d e) where
+  return = pure
+  T6 a b c d e f >>= g = case g f of
+    T6 a' b' c' d' e' f' -> T6 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') f'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f) => Hashable (T6 a b c d e f) where
   hash (T6 a b c d e f) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f
@@ -139,9 +295,32 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T6 a1 b1 c1 d1 e1 f1 <> T6 a2 b2 c2 d2 e2 f2 = T6 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2)
   stimes ii (T6 a b c d e f) = T6 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f)
 
+instance Bifunctor (T6 x y z w) where
+  bimap f g (T6 x y z w a b) = T6 x y z w (f a) (g b)
+
+instance Bifoldable (T6 x y z w) where
+  bifoldMap f g (T6 _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T6 x y z w) where
+  bitraverse f g (T6 x y z w a b) = T6 x y z w <$> f a <*> g b
+
 data T7 a b c d e f g
   = T7 a b c d e f g
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f) => Applicative (T7 a b c d e f) where
+  pure g = T7 mempty mempty mempty mempty mempty mempty g
+  T7 a b c d e f g <*> T7 a' b' c' d' e' f' g' =
+    T7 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g g')
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f) => Monad (T7 a b c d e f) where
+  return = pure
+  T7 a b c d e f g >>= h = case h g of
+    T7 a' b' c' d' e' f' g' -> T7 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') g'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g) => Hashable (T7 a b c d e f g) where
   hash (T7 a b c d e f g) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g
@@ -164,9 +343,34 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T7 a1 b1 c1 d1 e1 f1 g1 <> T7 a2 b2 c2 d2 e2 f2 g2 = T7 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2)
   stimes ii (T7 a b c d e f g) = T7 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g)
 
+instance Bifunctor (T7 x y z w t) where
+  bimap f g (T7 x y z w t a b) = T7 x y z w t (f a) (g b)
+
+instance Bifoldable (T7 x y z w t) where
+  bifoldMap f g (T7 _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T7 x y z w t) where
+  bitraverse f g (T7 x y z w t a b) = T7 x y z w t <$> f a <*> g b
+
+
 data T8 a b c d e f g h
   = T8 a b c d e f g h
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g) => Applicative (T8 a b c d e f g) where
+  pure h = T8 mempty mempty mempty mempty mempty mempty mempty h
+  T8 a b c d e f g h <*> T8 a' b' c' d' e' f' g' h' =
+    T8 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h h')
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g) => Monad (T8 a b c d e f g) where
+  return = pure
+  T8 a b c d e f g h >>= i = case i h of
+    T8 a' b' c' d' e' f' g' h' ->
+      T8 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') h'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h) => Hashable (T8 a b c d e f g h) where
   hash (T8 a b c d e f g h) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h
@@ -189,9 +393,33 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T8 a1 b1 c1 d1 e1 f1 g1 h1 <> T8 a2 b2 c2 d2 e2 f2 g2 h2 = T8 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2)
   stimes ii (T8 a b c d e f g h) = T8 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h)
 
+instance Bifunctor (T8 x y z w t u) where
+  bimap f g (T8 x y z w t u a b) = T8 x y z w t u (f a) (g b)
+
+instance Bifoldable (T8 x y z w t u) where
+  bifoldMap f g (T8 _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T8 x y z w t u) where
+  bitraverse f g (T8 x y z w t u a b) = T8 x y z w t u <$> f a <*> g b
+
 data T9 a b c d e f g h i
   = T9 a b c d e f g h i
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h) => Applicative (T9 a b c d e f g h) where
+  pure i = T9 mempty mempty mempty mempty mempty mempty mempty mempty i
+  T9 a b c d e f g h i <*> T9 a' b' c' d' e' f' g' h' i' =
+    T9 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i i')
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h) => Monad (T9 a b c d e f g h) where
+  return = pure
+  T9 a b c d e f g h i >>= j = case j i of
+    T9 a' b' c' d' e' f' g' h' i' ->
+      T9 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') i'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i) => Hashable (T9 a b c d e f g h i) where
   hash (T9 a b c d e f g h i) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i
@@ -214,9 +442,33 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T9 a1 b1 c1 d1 e1 f1 g1 h1 i1 <> T9 a2 b2 c2 d2 e2 f2 g2 h2 i2 = T9 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2)
   stimes ii (T9 a b c d e f g h i) = T9 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i)
 
+instance Bifunctor (T9 x y z w t u v) where
+  bimap f g (T9 x y z w t u v a b) = T9 x y z w t u v (f a) (g b)
+
+instance Bifoldable (T9 x y z w t u v) where
+  bifoldMap f g (T9 _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T9 x y z w t u v) where
+  bitraverse f g (T9 x y z w t u v a b) = T9 x y z w t u v <$> f a <*> g b
+
 data T10 a b c d e f g h i j
   = T10 a b c d e f g h i j
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i) => Applicative (T10 a b c d e f g h i) where
+  pure j = T10 mempty mempty mempty mempty mempty mempty mempty mempty mempty j
+  T10 a b c d e f g h i j <*> T10 a' b' c' d' e' f' g' h' i' j' =
+    T10 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j j')
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i) => Monad (T10 a b c d e f g h i) where
+  return = pure
+  T10 a b c d e f g h i j >>= k = case k j of
+    T10 a' b' c' d' e' f' g' h' i' j' ->
+      T10 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') j'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j) => Hashable (T10 a b c d e f g h i j) where
   hash (T10 a b c d e f g h i j) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j
@@ -239,9 +491,33 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T10 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 <> T10 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 = T10 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2)
   stimes ii (T10 a b c d e f g h i j) = T10 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j)
 
+instance Bifunctor (T10 x y z w t u v p) where
+  bimap f g (T10 x y z w t u v p a b) = T10 x y z w t u v p (f a) (g b)
+
+instance Bifoldable (T10 x y z w t u v p) where
+  bifoldMap f g (T10 _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T10 x y z w t u v p) where
+  bitraverse f g (T10 x y z w t u v p a b) = T10 x y z w t u v p <$> f a <*> g b
+
 data T11 a b c d e f g h i j k
   = T11 a b c d e f g h i j k
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j) => Applicative (T11 a b c d e f g h i j) where
+  pure k = T11 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty k
+  T11 a b c d e f g h i j k <*> T11 a' b' c' d' e' f' g' h' i' j' k' =
+    T11 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k k')
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j) => Monad (T11 a b c d e f g h i j) where
+  return = pure
+  T11 a b c d e f g h i j k >>= l = case l k of
+    T11 a' b' c' d' e' f' g' h' i' j' k' ->
+      T11 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') k'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k) => Hashable (T11 a b c d e f g h i j k) where
   hash (T11 a b c d e f g h i j k) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k
@@ -264,9 +540,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T11 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 <> T11 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 = T11 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2)
   stimes ii (T11 a b c d e f g h i j k) = T11 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k)
 
+instance Bifunctor (T11 x y z w t u v p q) where
+  bimap f g (T11 x y z w t u v p q a b) = T11 x y z w t u v p q (f a) (g b)
+
+instance Bifoldable (T11 x y z w t u v p q) where
+  bifoldMap f g (T11 _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T11 x y z w t u v p q) where
+  bitraverse f g (T11 x y z w t u v p q a b) = T11 x y z w t u v p q <$> f a <*> g b
+
 data T12 a b c d e f g h i j k l
   = T12 a b c d e f g h i j k l
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k)
+  => Applicative (T12 a b c d e f g h i j k) where
+  pure l = T12 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty l
+  T12 a b c d e f g h i j k l <*> T12 a' b' c' d' e' f' g' h' i' j' k' l' =
+    T12 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l l')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k)
+  => Monad (T12 a b c d e f g h i j k) where
+  return = pure
+  T12 a b c d e f g h i j k l >>= m = case m l of
+    T12 a' b' c' d' e' f' g' h' i' j' k' l' ->
+      T12 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') l'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l) => Hashable (T12 a b c d e f g h i j k l) where
   hash (T12 a b c d e f g h i j k l) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l
@@ -289,9 +593,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T12 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 <> T12 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 = T12 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2)
   stimes ii (T12 a b c d e f g h i j k l) = T12 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l)
 
+instance Bifunctor (T12 x y z w t u v p q r) where
+  bimap f g (T12 x y z w t u v p q r a b) = T12 x y z w t u v p q r (f a) (g b)
+
+instance Bifoldable (T12 x y z w t u v p q r) where
+  bifoldMap f g (T12 _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T12 x y z w t u v p q r) where
+  bitraverse f g (T12 x y z w t u v p q r a b) = T12 x y z w t u v p q r <$> f a <*> g b
+
 data T13 a b c d e f g h i j k l m
   = T13 a b c d e f g h i j k l m
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l)
+  => Applicative (T13 a b c d e f g h i j k l) where
+  pure m = T13 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty m
+  T13 a b c d e f g h i j k l m <*> T13 a' b' c' d' e' f' g' h' i' j' k' l' m' =
+    T13 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m m')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l)
+  => Monad (T13 a b c d e f g h i j k l) where
+  return = pure
+  T13 a b c d e f g h i j k l m >>= n = case n m of
+    T13 a' b' c' d' e' f' g' h' i' j' k' l' m' ->
+      T13 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') m'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l, Hashable m) => Hashable (T13 a b c d e f g h i j k l m) where
   hash (T13 a b c d e f g h i j k l m) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l `hashWithSalt` m
@@ -314,9 +646,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T13 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 <> T13 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 = T13 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2)
   stimes ii (T13 a b c d e f g h i j k l m) = T13 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l) (stimes ii m)
 
+instance Bifunctor (T13 x y z w t u v p q r s) where
+  bimap f g (T13 x y z w t u v p q r s a b) = T13 x y z w t u v p q r s (f a) (g b)
+
+instance Bifoldable (T13 x y z w t u v p q r s) where
+  bifoldMap f g (T13 _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T13 x y z w t u v p q r s) where
+  bitraverse f g (T13 x y z w t u v p q r s a b) = T13 x y z w t u v p q r s <$> f a <*> g b
+
 data T14 a b c d e f g h i j k l m n
   = T14 a b c d e f g h i j k l m n
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m)
+  => Applicative (T14 a b c d e f g h i j k l m) where
+  pure n = T14 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty n
+  T14 a b c d e f g h i j k l m n <*> T14 a' b' c' d' e' f' g' h' i' j' k' l' m' n' =
+    T14 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n n')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m)
+  => Monad (T14 a b c d e f g h i j k l m) where
+  return = pure
+  T14 a b c d e f g h i j k l m n >>= o = case o n of
+    T14 a' b' c' d' e' f' g' h' i' j' k' l' m' n' ->
+      T14 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') n'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l, Hashable m, Hashable n) => Hashable (T14 a b c d e f g h i j k l m n) where
   hash (T14 a b c d e f g h i j k l m n) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l `hashWithSalt` m `hashWithSalt` n
@@ -339,9 +699,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T14 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 <> T14 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 = T14 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2)
   stimes ii (T14 a b c d e f g h i j k l m n) = T14 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l) (stimes ii m) (stimes ii n)
 
+instance Bifunctor (T14 x y z w t u v p q r s i) where
+  bimap f g (T14 x y z w t u v p q r s i a b) = T14 x y z w t u v p q r s i (f a) (g b)
+
+instance Bifoldable (T14 x y z w t u v p q r s i) where
+  bifoldMap f g (T14 _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T14 x y z w t u v p q r s i) where
+  bitraverse f g (T14 x y z w t u v p q r s i a b) = T14 x y z w t u v p q r s i <$> f a <*> g b
+
 data T15 a b c d e f g h i j k l m n o
   = T15 a b c d e f g h i j k l m n o
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n)
+  => Applicative (T15 a b c d e f g h i j k l m n) where
+  pure o = T15 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty o
+  T15 a b c d e f g h i j k l m n o <*> T15 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' =
+    T15 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o o')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n)
+  => Monad (T15 a b c d e f g h i j k l m n) where
+  return = pure
+  T15 a b c d e f g h i j k l m n o >>= p = case p o of
+    T15 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' ->
+      T15 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') o'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l, Hashable m, Hashable n, Hashable o) => Hashable (T15 a b c d e f g h i j k l m n o) where
   hash (T15 a b c d e f g h i j k l m n o) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l `hashWithSalt` m `hashWithSalt` n `hashWithSalt` o
@@ -364,9 +752,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T15 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 <> T15 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 = T15 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2)
   stimes ii (T15 a b c d e f g h i j k l m n o) = T15 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l) (stimes ii m) (stimes ii n) (stimes ii o)
 
+instance Bifunctor (T15 x y z w t u v p q r s i j) where
+  bimap f g (T15 x y z w t u v p q r s i j a b) = T15 x y z w t u v p q r s i j (f a) (g b)
+
+instance Bifoldable (T15 x y z w t u v p q r s i j) where
+  bifoldMap f g (T15 _  _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T15 x y z w t u v p q r s i j) where
+  bitraverse f g (T15 x y z w t u v p q r s i j a b) = T15 x y z w t u v p q r s i j <$> f a <*> g b
+
 data T16 a b c d e f g h i j k l m n o p
   = T16 a b c d e f g h i j k l m n o p
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o)
+  => Applicative (T16 a b c d e f g h i j k l m n o) where
+  pure p = T16 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty p
+  T16 a b c d e f g h i j k l m n o p <*> T16 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' =
+    T16 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p p')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o)
+  => Monad (T16 a b c d e f g h i j k l m n o) where
+  return = pure
+  T16 a b c d e f g h i j k l m n o p >>= q = case q p of
+    T16 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' ->
+      T16 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') p'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l, Hashable m, Hashable n, Hashable o, Hashable p) => Hashable (T16 a b c d e f g h i j k l m n o p) where
   hash (T16 a b c d e f g h i j k l m n o p) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l `hashWithSalt` m `hashWithSalt` n `hashWithSalt` o `hashWithSalt` p
@@ -389,9 +805,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T16 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 <> T16 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 = T16 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2)
   stimes ii (T16 a b c d e f g h i j k l m n o p) = T16 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l) (stimes ii m) (stimes ii n) (stimes ii o) (stimes ii p)
 
+instance Bifunctor (T16 x y z w t u v p q r s i j k) where
+  bimap f g (T16 x y z w t u v p q r s i j k a b) = T16 x y z w t u v p q r s i j k (f a) (g b)
+
+instance Bifoldable (T16 x y z w t u v p q r s i j k) where
+  bifoldMap f g (T16 _ _ _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T16 x y z w t u v p q r s i j k) where
+  bitraverse f g (T16 x y z w t u v p q r s i j k a b) = T16 x y z w t u v p q r s i j k <$> f a <*> g b
+
 data T17 a b c d e f g h i j k l m n o p q
   = T17 a b c d e f g h i j k l m n o p q
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p)
+  => Applicative (T17 a b c d e f g h i j k l m n o p) where
+  pure q = T17 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty q
+  T17 a b c d e f g h i j k l m n o p q <*> T17 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' =
+    T17 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q q')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p)
+  => Monad (T17 a b c d e f g h i j k l m n o p) where
+  return = pure
+  T17 a b c d e f g h i j k l m n o p q >>= r = case r q of
+    T17 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' ->
+      T17 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') q'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l, Hashable m, Hashable n, Hashable o, Hashable p, Hashable q) => Hashable (T17 a b c d e f g h i j k l m n o p q) where
   hash (T17 a b c d e f g h i j k l m n o p q) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l `hashWithSalt` m `hashWithSalt` n `hashWithSalt` o `hashWithSalt` p `hashWithSalt` q
@@ -414,9 +858,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T17 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 q1 <> T17 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 q2 = T17 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2) (q1 <> q2)
   stimes ii (T17 a b c d e f g h i j k l m n o p q) = T17 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l) (stimes ii m) (stimes ii n) (stimes ii o) (stimes ii p) (stimes ii q)
 
+instance Bifunctor (T17 x y z w t u v p q r s i j k l) where
+  bimap f g (T17 x y z w t u v p q r s i j k l a b) = T17 x y z w t u v p q r s i j k l (f a) (g b)
+
+instance Bifoldable (T17 x y z w t u v p q r s i j k l) where
+  bifoldMap f g (T17 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T17 x y z w t u v p q r s i j k l) where
+  bitraverse f g (T17 x y z w t u v p q r s i j k l a b) = T17 x y z w t u v p q r s i j k l <$> f a <*> g b
+
 data T18 a b c d e f g h i j k l m n o p q r
   = T18 a b c d e f g h i j k l m n o p q r
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q)
+  => Applicative (T18 a b c d e f g h i j k l m n o p q) where
+  pure r = T18 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty r
+  T18 a b c d e f g h i j k l m n o p q r <*> T18 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' =
+    T18 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q <> q') (r r')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q)
+  => Monad (T18 a b c d e f g h i j k l m n o p q) where
+  return = pure
+  T18 a b c d e f g h i j k l m n o p q r >>= s = case s r of
+    T18 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' ->
+      T18 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q <> q') r'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l, Hashable m, Hashable n, Hashable o, Hashable p, Hashable q, Hashable r) => Hashable (T18 a b c d e f g h i j k l m n o p q r) where
   hash (T18 a b c d e f g h i j k l m n o p q r) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l `hashWithSalt` m `hashWithSalt` n `hashWithSalt` o `hashWithSalt` p `hashWithSalt` q `hashWithSalt` r
@@ -439,9 +911,37 @@ instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semig
   T18 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 q1 r1 <> T18 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 q2 r2 = T18 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2) (q1 <> q2) (r1 <> r2)
   stimes ii (T18 a b c d e f g h i j k l m n o p q r) = T18 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l) (stimes ii m) (stimes ii n) (stimes ii o) (stimes ii p) (stimes ii q) (stimes ii r)
 
+instance Bifunctor (T18 x y z w t u v p q r s i j k l m) where
+  bimap f g (T18 x y z w t u v p q r s i j k l m a b) = T18 x y z w t u v p q r s i j k l m (f a) (g b)
+
+instance Bifoldable (T18 x y z w t u v p q r s i j k l m) where
+  bifoldMap f g (T18 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T18 x y z w t u v p q r s i j k l m) where
+  bitraverse f g (T18 x y z w t u v p q r s i j k l m a b) = T18 x y z w t u v p q r s i j k l m <$> f a <*> g b
+
 data T19 a b c d e f g h i j k l m n o p q r s
   = T19 a b c d e f g h i j k l m n o p q r s
-  deriving (Bounded, Eq, Generic, Ord, Read, Show)
+  deriving
+    ( Bounded, Eq, Ord, Read, Show
+    , Generic
+    , Functor, Foldable, Traversable
+    )
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r)
+  => Applicative (T19 a b c d e f g h i j k l m n o p q r) where
+  pure s = T19 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty s
+  T19 a b c d e f g h i j k l m n o p q r s <*> T19 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' =
+    T19 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q <> q') (r <> r') (s s')
+
+instance
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r)
+  => Monad (T19 a b c d e f g h i j k l m n o p q r) where
+  return = pure
+  T19 a b c d e f g h i j k l m n o p q r s >>= t = case t s of
+    T19 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' ->
+      T19 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q <> q') (r <> r') s'
 
 instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f, Hashable g, Hashable h, Hashable i, Hashable j, Hashable k, Hashable l, Hashable m, Hashable n, Hashable o, Hashable p, Hashable q, Hashable r, Hashable s) => Hashable (T19 a b c d e f g h i j k l m n o p q r s) where
   hash (T19 a b c d e f g h i j k l m n o p q r s) = hash a `hashWithSalt` b `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f `hashWithSalt` g `hashWithSalt` h `hashWithSalt` i `hashWithSalt` j `hashWithSalt` k `hashWithSalt` l `hashWithSalt` m `hashWithSalt` n `hashWithSalt` o `hashWithSalt` p `hashWithSalt` q `hashWithSalt` r `hashWithSalt` s
@@ -463,3 +963,12 @@ instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m, Semigroup n, Semigroup o, Semigroup p, Semigroup q, Semigroup r, Semigroup s) => Semigroup (T19 a b c d e f g h i j k l m n o p q r s) where
   T19 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 q1 r1 s1 <> T19 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 q2 r2 s2 = T19 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2) (q1 <> q2) (r1 <> r2) (s1 <> s2)
   stimes ii (T19 a b c d e f g h i j k l m n o p q r s) = T19 (stimes ii a) (stimes ii b) (stimes ii c) (stimes ii d) (stimes ii e) (stimes ii f) (stimes ii g) (stimes ii h) (stimes ii i) (stimes ii j) (stimes ii k) (stimes ii l) (stimes ii m) (stimes ii n) (stimes ii o) (stimes ii p) (stimes ii q) (stimes ii r) (stimes ii s)
+
+instance Bifunctor (T19 x y z w t u v p q r s i j k l m n) where
+  bimap f g (T19 x y z w t u v p q r s i j k l m n a b) = T19 x y z w t u v p q r s i j k l m n (f a) (g b)
+
+instance Bifoldable (T19 x y z w t u v p q r s i j k l m n) where
+  bifoldMap f g (T19 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+
+instance Bitraversable (T19 x y z w t u v p q r s i j k l m n) where
+  bitraverse f g (T19 x y z w t u v p q r s i j k l m n a b) = T19 x y z w t u v p q r s i j k l m n <$> f a <*> g b

@@ -26,7 +26,8 @@ source-repository head
 
 library
   build-depends:
-      base ^>= 4.11 || ^>= 4.12
+      base >= 4.11 && < 4.13
+    , bifunctors ^>= 5.5
     , deepseq >= 1.4.3.0
     , hashable >= 1.2.5.0
   default-language:
