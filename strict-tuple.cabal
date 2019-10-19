@@ -13,7 +13,7 @@ copyright: (c) 2018, Mitchell Rosen
 license: BSD-3-Clause
 license-file: LICENSE
 build-type: Simple
-tested-with: GHC == 8.4.4, GHC == 8.6.2
+tested-with: GHC == 8.4.4, GHC == 8.6.5, GHC == 8.8.1
 
 extra-source-files:
   .travis.yml
