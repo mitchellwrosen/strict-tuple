@@ -5,9 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to the [Haskell Package Versioning Policy](https://pvp.haskell.org/).
 
-## [0.1.3] - 2019-10-19
+## [0.1.3] - 2019-10-20
 ### Added
 - `Applicative`, `Biapplicative`, `Bifoldable`, `Bifunctor`, `Bitraversable`, `Foldable`, `Functor`, `Monad`, and `Traversable` instances
+- `sfst`, `ssnd`, `scurry`, `suncurry`, `sswap`
 
 ## [0.1.2] - 2019-01-04
 ### Added
