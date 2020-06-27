@@ -2,3 +2,4 @@
 .ghcid
 dist/
 dist-newstyle/
+hie.yaml
