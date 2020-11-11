@@ -9,9 +9,35 @@
 {-# LANGUAGE StrictData #-}
 
 -- | Strict tuples.
-module Data.Tuple.Strict where
+module Data.Tuple.Strict
+  ( T1 (..),
+    T2 (..),
+    sfst,
+    ssnd,
+    scurry,
+    suncurry,
+    sswap,
+    T3 (..),
+    T4 (..),
+    T5 (..),
+    T6 (..),
+    T7 (..),
+    T8 (..),
+    T9 (..),
+    T10 (..),
+    T11 (..),
+    T12 (..),
+    T13 (..),
+    T14 (..),
+    T15 (..),
+    T16 (..),
+    T17 (..),
+    T18 (..),
+    T19 (..),
+  )
+where
 
-import Control.DeepSeq (NFData, rnf, rwhnf)
+import Control.DeepSeq (NFData, rnf)
 import Data.Biapplicative
 import Data.Bifoldable
 import Data.Bitraversable
@@ -88,8 +114,9 @@ instance Hashable2 T2 where
 instance (Monoid a, Monoid b) => Monoid (T2 a b) where
   mempty = T2 mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b) => NFData (T2 a b) where
-  rnf = rwhnf
+  rnf (T2 a b) = rnf a `seq` rnf b
 
 instance (Semigroup a, Semigroup b) => Semigroup (T2 a b) where
   T2 a1 b1 <> T2 a2 b2 = T2 (a1 <> a2) (b1 <> b2)
@@ -180,8 +207,9 @@ instance Hashable a => Hashable2 (T3 a) where
 instance (Monoid a, Monoid b, Monoid c) => Monoid (T3 a b c) where
   mempty = T3 mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c) => NFData (T3 a b c) where
-  rnf = rwhnf
+  rnf (T3 a b c) = rnf a `seq` rnf b `seq` rnf c
 
 instance (Semigroup a, Semigroup b, Semigroup c) => Semigroup (T3 a b c) where
   T3 a1 b1 c1 <> T3 a2 b2 c2 = T3 (a1 <> a2) (b1 <> b2) (c1 <> c2)
@@ -237,8 +265,9 @@ instance (Hashable a, Hashable b) => Hashable2 (T4 a b) where
 instance (Monoid a, Monoid b, Monoid c, Monoid d) => Monoid (T4 a b c d) where
   mempty = T4 mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d) => NFData (T4 a b c d) where
-  rnf = rwhnf
+  rnf (T4 a b c d) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d) => Semigroup (T4 a b c d) where
   T4 a1 b1 c1 d1 <> T4 a2 b2 c2 d2 = T4 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2)
@@ -294,8 +323,9 @@ instance (Hashable a, Hashable b, Hashable c) => Hashable2 (T5 a b c) where
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e) => Monoid (T5 a b c d e) where
   mempty = T5 mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e) => NFData (T5 a b c d e) where
-  rnf = rwhnf
+  rnf (T5 a b c d e) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e) => Semigroup (T5 a b c d e) where
   T5 a1 b1 c1 d1 e1 <> T5 a2 b2 c2 d2 e2 = T5 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2)
@@ -352,8 +382,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d) => Hashable2 (T6 a b c
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f) => Monoid (T6 a b c d e f) where
   mempty = T6 mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f) => NFData (T6 a b c d e f) where
-  rnf = rwhnf
+  rnf (T6 a b c d e f) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f) => Semigroup (T6 a b c d e f) where
   T6 a1 b1 c1 d1 e1 f1 <> T6 a2 b2 c2 d2 e2 f2 = T6 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2)
@@ -410,8 +441,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e) => Hashabl
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g) => Monoid (T7 a b c d e f g) where
   mempty = T7 mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g) => NFData (T7 a b c d e f g) where
-  rnf = rwhnf
+  rnf (T7 a b c d e f g) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g) => Semigroup (T7 a b c d e f g) where
   T7 a1 b1 c1 d1 e1 f1 g1 <> T7 a2 b2 c2 d2 e2 f2 g2 = T7 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2)
@@ -469,8 +501,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h) => Monoid (T8 a b c d e f g h) where
   mempty = T8 mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h) => NFData (T8 a b c d e f g h) where
-  rnf = rwhnf
+  rnf (T8 a b c d e f g h) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h) => Semigroup (T8 a b c d e f g h) where
   T8 a1 b1 c1 d1 e1 f1 g1 h1 <> T8 a2 b2 c2 d2 e2 f2 g2 h2 = T8 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2)
@@ -528,8 +561,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i) => Monoid (T9 a b c d e f g h i) where
   mempty = T9 mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i) => NFData (T9 a b c d e f g h i) where
-  rnf = rwhnf
+  rnf (T9 a b c d e f g h i) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i) => Semigroup (T9 a b c d e f g h i) where
   T9 a1 b1 c1 d1 e1 f1 g1 h1 i1 <> T9 a2 b2 c2 d2 e2 f2 g2 h2 i2 = T9 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2)
@@ -587,8 +621,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j) => Monoid (T10 a b c d e f g h i j) where
   mempty = T10 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j) => NFData (T10 a b c d e f g h i j) where
-  rnf = rwhnf
+  rnf (T10 a b c d e f g h i j) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j) => Semigroup (T10 a b c d e f g h i j) where
   T10 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 <> T10 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 = T10 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2)
@@ -646,8 +681,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k) => Monoid (T11 a b c d e f g h i j k) where
   mempty = T11 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k) => NFData (T11 a b c d e f g h i j k) where
-  rnf = rwhnf
+  rnf (T11 a b c d e f g h i j k) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k) => Semigroup (T11 a b c d e f g h i j k) where
   T11 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 <> T11 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 = T11 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2)
@@ -711,8 +747,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l) => Monoid (T12 a b c d e f g h i j k l) where
   mempty = T12 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l) => NFData (T12 a b c d e f g h i j k l) where
-  rnf = rwhnf
+  rnf (T12 a b c d e f g h i j k l) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l) => Semigroup (T12 a b c d e f g h i j k l) where
   T12 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 <> T12 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 = T12 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2)
@@ -776,8 +813,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m) => Monoid (T13 a b c d e f g h i j k l m) where
   mempty = T13 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l, NFData m) => NFData (T13 a b c d e f g h i j k l m) where
-  rnf = rwhnf
+  rnf (T13 a b c d e f g h i j k l m) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l `seq` rnf m
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m) => Semigroup (T13 a b c d e f g h i j k l m) where
   T13 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 <> T13 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 = T13 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2)
@@ -841,8 +879,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n) => Monoid (T14 a b c d e f g h i j k l m n) where
   mempty = T14 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l, NFData m, NFData n) => NFData (T14 a b c d e f g h i j k l m n) where
-  rnf = rwhnf
+  rnf (T14 a b c d e f g h i j k l m n) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l `seq` rnf m `seq` rnf n
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m, Semigroup n) => Semigroup (T14 a b c d e f g h i j k l m n) where
   T14 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 <> T14 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 = T14 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2)
@@ -906,8 +945,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o) => Monoid (T15 a b c d e f g h i j k l m n o) where
   mempty = T15 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l, NFData m, NFData n, NFData o) => NFData (T15 a b c d e f g h i j k l m n o) where
-  rnf = rwhnf
+  rnf (T15 a b c d e f g h i j k l m n o) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l `seq` rnf m `seq` rnf n `seq` rnf o
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m, Semigroup n, Semigroup o) => Semigroup (T15 a b c d e f g h i j k l m n o) where
   T15 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 <> T15 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 = T15 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2)
@@ -971,8 +1011,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p) => Monoid (T16 a b c d e f g h i j k l m n o p) where
   mempty = T16 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l, NFData m, NFData n, NFData o, NFData p) => NFData (T16 a b c d e f g h i j k l m n o p) where
-  rnf = rwhnf
+  rnf (T16 a b c d e f g h i j k l m n o p) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l `seq` rnf m `seq` rnf n `seq` rnf o `seq` rnf p
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m, Semigroup n, Semigroup o, Semigroup p) => Semigroup (T16 a b c d e f g h i j k l m n o p) where
   T16 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 <> T16 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 = T16 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2)
@@ -1036,8 +1077,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q) => Monoid (T17 a b c d e f g h i j k l m n o p q) where
   mempty = T17 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l, NFData m, NFData n, NFData o, NFData p, NFData q) => NFData (T17 a b c d e f g h i j k l m n o p q) where
-  rnf = rwhnf
+  rnf (T17 a b c d e f g h i j k l m n o p q) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l `seq` rnf m `seq` rnf n `seq` rnf o `seq` rnf p `seq` rnf q
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m, Semigroup n, Semigroup o, Semigroup p, Semigroup q) => Semigroup (T17 a b c d e f g h i j k l m n o p q) where
   T17 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 q1 <> T17 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 q2 = T17 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2) (q1 <> q2)
@@ -1101,8 +1143,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r) => Monoid (T18 a b c d e f g h i j k l m n o p q r) where
   mempty = T18 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l, NFData m, NFData n, NFData o, NFData p, NFData q, NFData r) => NFData (T18 a b c d e f g h i j k l m n o p q r) where
-  rnf = rwhnf
+  rnf (T18 a b c d e f g h i j k l m n o p q r) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l `seq` rnf m `seq` rnf n `seq` rnf o `seq` rnf p `seq` rnf q `seq` rnf r
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m, Semigroup n, Semigroup o, Semigroup p, Semigroup q, Semigroup r) => Semigroup (T18 a b c d e f g h i j k l m n o p q r) where
   T18 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 q1 r1 <> T18 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 q2 r2 = T18 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2) (q1 <> q2) (r1 <> r2)
@@ -1166,8 +1209,9 @@ instance (Hashable a, Hashable b, Hashable c, Hashable d, Hashable e, Hashable f
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r, Monoid s) => Monoid (T19 a b c d e f g h i j k l m n o p q r s) where
   mempty = T19 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty
 
+-- | @since 0.1.4
 instance (NFData a, NFData b, NFData c, NFData d, NFData e, NFData f, NFData g, NFData h, NFData i, NFData j, NFData k, NFData l, NFData m, NFData n, NFData o, NFData p, NFData q, NFData r, NFData s) => NFData (T19 a b c d e f g h i j k l m n o p q r s) where
-  rnf = rwhnf
+  rnf (T19 a b c d e f g h i j k l m n o p q r s) = rnf a `seq` rnf b `seq` rnf c `seq` rnf d `seq` rnf e `seq` rnf f `seq` rnf g `seq` rnf h `seq` rnf i `seq` rnf j `seq` rnf k `seq` rnf l `seq` rnf m `seq` rnf n `seq` rnf o `seq` rnf p `seq` rnf q `seq` rnf r `seq` rnf s
 
 instance (Semigroup a, Semigroup b, Semigroup c, Semigroup d, Semigroup e, Semigroup f, Semigroup g, Semigroup h, Semigroup i, Semigroup j, Semigroup k, Semigroup l, Semigroup m, Semigroup n, Semigroup o, Semigroup p, Semigroup q, Semigroup r, Semigroup s) => Semigroup (T19 a b c d e f g h i j k l m n o p q r s) where
   T19 a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 q1 r1 s1 <> T19 a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 p2 q2 r2 s2 = T19 (a1 <> a2) (b1 <> b2) (c1 <> c2) (d1 <> d2) (e1 <> e2) (f1 <> f2) (g1 <> g2) (h1 <> h2) (i1 <> i2) (j1 <> j2) (k1 <> k2) (l1 <> l2) (m1 <> m2) (n1 <> n2) (o1 <> o2) (p1 <> p2) (q1 <> q2) (r1 <> r2) (s1 <> s2)
