@@ -47,6 +47,26 @@ library
     hashable ^>= 1.2.5.0 || ^>= 1.3
   exposed-modules: Data.Tuple.Strict
   hs-source-dirs: src
+  other-modules:
+    Data.Tuple.Strict.T1
+    Data.Tuple.Strict.T2
+    Data.Tuple.Strict.T3
+    Data.Tuple.Strict.T4
+    Data.Tuple.Strict.T5
+    Data.Tuple.Strict.T6
+    Data.Tuple.Strict.T7
+    Data.Tuple.Strict.T8
+    Data.Tuple.Strict.T9
+    Data.Tuple.Strict.T10
+    Data.Tuple.Strict.T11
+    Data.Tuple.Strict.T12
+    Data.Tuple.Strict.T13
+    Data.Tuple.Strict.T14
+    Data.Tuple.Strict.T15
+    Data.Tuple.Strict.T16
+    Data.Tuple.Strict.T17
+    Data.Tuple.Strict.T18
+    Data.Tuple.Strict.T19
 
 test-suite tests
   import: component
