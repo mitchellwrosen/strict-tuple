@@ -1,30 +1,31 @@
-{-# LANGUAGE DeriveAnyClass             #-}
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE DeriveFoldable             #-}
-{-# LANGUAGE DeriveFunctor              #-}
-{-# LANGUAGE DeriveTraversable          #-}
-{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE StrictData                 #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE StrictData #-}
 
 -- | Strict tuples.
-
 module Data.Tuple.Strict where
 
-
 import Control.DeepSeq (NFData, rnf, rwhnf)
-
 import Data.Biapplicative
 import Data.Bifoldable
 import Data.Bitraversable
 import Data.Hashable (Hashable, hash, hashWithSalt)
-import Data.Hashable.Lifted (Hashable1, Hashable2, defaultLiftHashWithSalt,
-                             hashWithSalt1, liftHashWithSalt, liftHashWithSalt2)
+import Data.Hashable.Lifted
+  ( Hashable1,
+    Hashable2,
+    defaultLiftHashWithSalt,
+    hashWithSalt1,
+    liftHashWithSalt,
+    liftHashWithSalt2,
+  )
 import Data.Semigroup
-
 import GHC.Generics (Generic)
-
 
 newtype T1 a
   = T1 a
@@ -33,8 +34,10 @@ newtype T1 a
 
 -- | @since 0.1.3
 deriving stock instance Foldable T1
+
 -- | @since 0.1.3
 deriving stock instance Functor T1
+
 -- | @since 0.1.3
 deriving stock instance Traversable T1
 
@@ -54,8 +57,10 @@ data T2 a b
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T2 a)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T2 a)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T2 a)
 
@@ -143,8 +148,10 @@ data T3 a b c
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T3 a b)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T3 a b)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T3 a b)
 
@@ -198,8 +205,10 @@ data T4 a b c d
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T4 a b c)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T4 a b c)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T4 a b c)
 
@@ -253,8 +262,10 @@ data T5 a b c d e
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T5 a b c d)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T5 a b c d)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T5 a b c d)
 
@@ -308,8 +319,10 @@ data T6 a b c d e f
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T6 a b c d e)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T6 a b c d e)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T6 a b c d e)
 
@@ -364,8 +377,10 @@ data T7 a b c d e f g
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T7 a b c d e f)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T7 a b c d e f)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T7 a b c d e f)
 
@@ -414,15 +429,16 @@ instance Bifoldable (T7 x y z w t) where
 instance Bitraversable (T7 x y z w t) where
   bitraverse f g (T7 x y z w t a b) = T7 x y z w t <$> f a <*> g b
 
-
 data T8 a b c d e f g h
   = T8 a b c d e f g h
   deriving stock (Bounded, Eq, Ord, Read, Show, Generic)
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T8 a b c d e f g)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T8 a b c d e f g)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T8 a b c d e f g)
 
@@ -478,8 +494,10 @@ data T9 a b c d e f g h i
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T9 a b c d e f g h)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T9 a b c d e f g h)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T9 a b c d e f g h)
 
@@ -535,8 +553,10 @@ data T10 a b c d e f g h i j
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T10 a b c d e f g h i)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T10 a b c d e f g h i)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T10 a b c d e f g h i)
 
@@ -592,8 +612,10 @@ data T11 a b c d e f g h i j k
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T11 a b c d e f g h i j)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T11 a b c d e f g h i j)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T11 a b c d e f g h i j)
 
@@ -649,23 +671,27 @@ data T12 a b c d e f g h i j k l
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T12 a b c d e f g h i j k)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T12 a b c d e f g h i j k)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T12 a b c d e f g h i j k)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k)
-  => Applicative (T12 a b c d e f g h i j k) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k) =>
+  Applicative (T12 a b c d e f g h i j k)
+  where
   pure l = T12 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty l
   T12 a b c d e f g h i j k l <*> T12 a' b' c' d' e' f' g' h' i' j' k' l' =
     T12 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l l')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k)
-  => Monad (T12 a b c d e f g h i j k) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k) =>
+  Monad (T12 a b c d e f g h i j k)
+  where
   return = pure
   T12 a b c d e f g h i j k l >>= m = case m l of
     T12 a' b' c' d' e' f' g' h' i' j' k' l' ->
@@ -710,23 +736,27 @@ data T13 a b c d e f g h i j k l m
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T13 a b c d e f g h i j k l)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T13 a b c d e f g h i j k l)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T13 a b c d e f g h i j k l)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l)
-  => Applicative (T13 a b c d e f g h i j k l) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l) =>
+  Applicative (T13 a b c d e f g h i j k l)
+  where
   pure m = T13 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty m
   T13 a b c d e f g h i j k l m <*> T13 a' b' c' d' e' f' g' h' i' j' k' l' m' =
     T13 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m m')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l)
-  => Monad (T13 a b c d e f g h i j k l) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l) =>
+  Monad (T13 a b c d e f g h i j k l)
+  where
   return = pure
   T13 a b c d e f g h i j k l m >>= n = case n m of
     T13 a' b' c' d' e' f' g' h' i' j' k' l' m' ->
@@ -771,23 +801,27 @@ data T14 a b c d e f g h i j k l m n
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T14 a b c d e f g h i j k l m)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T14 a b c d e f g h i j k l m)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T14 a b c d e f g h i j k l m)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m)
-  => Applicative (T14 a b c d e f g h i j k l m) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m) =>
+  Applicative (T14 a b c d e f g h i j k l m)
+  where
   pure n = T14 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty n
   T14 a b c d e f g h i j k l m n <*> T14 a' b' c' d' e' f' g' h' i' j' k' l' m' n' =
     T14 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n n')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m)
-  => Monad (T14 a b c d e f g h i j k l m) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m) =>
+  Monad (T14 a b c d e f g h i j k l m)
+  where
   return = pure
   T14 a b c d e f g h i j k l m n >>= o = case o n of
     T14 a' b' c' d' e' f' g' h' i' j' k' l' m' n' ->
@@ -832,23 +866,27 @@ data T15 a b c d e f g h i j k l m n o
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T15 a b c d e f g h i j k l m n)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T15 a b c d e f g h i j k l m n)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T15 a b c d e f g h i j k l m n)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n)
-  => Applicative (T15 a b c d e f g h i j k l m n) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n) =>
+  Applicative (T15 a b c d e f g h i j k l m n)
+  where
   pure o = T15 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty o
   T15 a b c d e f g h i j k l m n o <*> T15 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' =
     T15 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o o')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n)
-  => Monad (T15 a b c d e f g h i j k l m n) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n) =>
+  Monad (T15 a b c d e f g h i j k l m n)
+  where
   return = pure
   T15 a b c d e f g h i j k l m n o >>= p = case p o of
     T15 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' ->
@@ -881,7 +919,7 @@ instance Bifunctor (T15 x y z w t u v p q r s i j) where
 
 -- | @since 0.1.3
 instance Bifoldable (T15 x y z w t u v p q r s i j) where
-  bifoldMap f g (T15 _  _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
+  bifoldMap f g (T15 _ _ _ _ _ _ _ _ _ _ _ _ _ a b) = f a <> g b
 
 -- | @since 0.1.3
 instance Bitraversable (T15 x y z w t u v p q r s i j) where
@@ -893,23 +931,27 @@ data T16 a b c d e f g h i j k l m n o p
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T16 a b c d e f g h i j k l m n o)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T16 a b c d e f g h i j k l m n o)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T16 a b c d e f g h i j k l m n o)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o)
-  => Applicative (T16 a b c d e f g h i j k l m n o) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o) =>
+  Applicative (T16 a b c d e f g h i j k l m n o)
+  where
   pure p = T16 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty p
   T16 a b c d e f g h i j k l m n o p <*> T16 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' =
     T16 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p p')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o)
-  => Monad (T16 a b c d e f g h i j k l m n o) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o) =>
+  Monad (T16 a b c d e f g h i j k l m n o)
+  where
   return = pure
   T16 a b c d e f g h i j k l m n o p >>= q = case q p of
     T16 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' ->
@@ -954,23 +996,27 @@ data T17 a b c d e f g h i j k l m n o p q
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T17 a b c d e f g h i j k l m n o p)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T17 a b c d e f g h i j k l m n o p)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T17 a b c d e f g h i j k l m n o p)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p)
-  => Applicative (T17 a b c d e f g h i j k l m n o p) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p) =>
+  Applicative (T17 a b c d e f g h i j k l m n o p)
+  where
   pure q = T17 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty q
   T17 a b c d e f g h i j k l m n o p q <*> T17 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' =
     T17 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q q')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p)
-  => Monad (T17 a b c d e f g h i j k l m n o p) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p) =>
+  Monad (T17 a b c d e f g h i j k l m n o p)
+  where
   return = pure
   T17 a b c d e f g h i j k l m n o p q >>= r = case r q of
     T17 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' ->
@@ -1015,23 +1061,27 @@ data T18 a b c d e f g h i j k l m n o p q r
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T18 a b c d e f g h i j k l m n o p q)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T18 a b c d e f g h i j k l m n o p q)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T18 a b c d e f g h i j k l m n o p q)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q)
-  => Applicative (T18 a b c d e f g h i j k l m n o p q) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q) =>
+  Applicative (T18 a b c d e f g h i j k l m n o p q)
+  where
   pure r = T18 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty r
   T18 a b c d e f g h i j k l m n o p q r <*> T18 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' =
     T18 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q <> q') (r r')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q)
-  => Monad (T18 a b c d e f g h i j k l m n o p q) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q) =>
+  Monad (T18 a b c d e f g h i j k l m n o p q)
+  where
   return = pure
   T18 a b c d e f g h i j k l m n o p q r >>= s = case s r of
     T18 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' ->
@@ -1076,23 +1126,27 @@ data T19 a b c d e f g h i j k l m n o p q r s
 
 -- | @since 0.1.3
 deriving stock instance Foldable (T19 a b c d e f g h i j k l m n o p q r)
+
 -- | @since 0.1.3
 deriving stock instance Functor (T19 a b c d e f g h i j k l m n o p q r)
+
 -- | @since 0.1.3
 deriving stock instance Traversable (T19 a b c d e f g h i j k l m n o p q r)
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r)
-  => Applicative (T19 a b c d e f g h i j k l m n o p q r) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r) =>
+  Applicative (T19 a b c d e f g h i j k l m n o p q r)
+  where
   pure s = T19 mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty mempty s
   T19 a b c d e f g h i j k l m n o p q r s <*> T19 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' =
     T19 (a <> a') (b <> b') (c <> c') (d <> d') (e <> e') (f <> f') (g <> g') (h <> h') (i <> i') (j <> j') (k <> k') (l <> l') (m <> m') (n <> n') (o <> o') (p <> p') (q <> q') (r <> r') (s s')
 
 -- | @since 0.1.3
 instance
-  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r)
-  => Monad (T19 a b c d e f g h i j k l m n o p q r) where
+  (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f, Monoid g, Monoid h, Monoid i, Monoid j, Monoid k, Monoid l, Monoid m, Monoid n, Monoid o, Monoid p, Monoid q, Monoid r) =>
+  Monad (T19 a b c d e f g h i j k l m n o p q r)
+  where
   return = pure
   T19 a b c d e f g h i j k l m n o p q r s >>= t = case t s of
     T19 a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' ->
