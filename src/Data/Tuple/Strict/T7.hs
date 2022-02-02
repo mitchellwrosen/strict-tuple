@@ -17,6 +17,7 @@ import Data.Biapplicative
 import Data.Bifoldable
 import Data.Bitraversable
 import Data.Hashable (Hashable, hash, hashWithSalt)
+import Data.Functor.Classes (Eq1 (liftEq), Eq2 (liftEq2))
 import Data.Hashable.Lifted
   ( Hashable1,
     Hashable2,
@@ -40,6 +41,15 @@ deriving stock instance Functor (T7 a b c d e f)
 
 -- | @since 0.1.3
 deriving stock instance Traversable (T7 a b c d e f)
+
+-- | @since 0.1.5
+instance (Eq a, Eq b, Eq c, Eq d, Eq e, Eq f) => Eq1 (T7 a b c d e f) where
+  liftEq = liftEq2 (==)
+
+-- | @since 0.1.5
+instance (Eq a, Eq b, Eq c, Eq d, Eq e) => Eq2 (T7 a b c d e) where
+  liftEq2 e1 e2 (T7 a b c d e f g) (T7 a' b' c' d' e' f' g') =
+    a == a' && b == b' && c == c' && d == d' && e == e' && e1 f f' && e2 g g'
 
 -- | @since 0.1.3
 instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e, Monoid f) => Applicative (T7 a b c d e f) where
