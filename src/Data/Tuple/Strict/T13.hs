@@ -16,6 +16,7 @@ import Control.DeepSeq (NFData, rnf)
 import Data.Biapplicative
 import Data.Bifoldable
 import Data.Bitraversable
+import Data.Functor.Classes (Eq1 (liftEq), Eq2 (liftEq2))
 import Data.Hashable (Hashable, hash, hashWithSalt)
 import Data.Hashable.Lifted
   ( Hashable1,
@@ -40,6 +41,15 @@ deriving stock instance Functor (T13 a b c d e f g h i j k l)
 
 -- | @since 0.1.3
 deriving stock instance Traversable (T13 a b c d e f g h i j k l)
+
+-- | @since 0.1.5
+instance (Eq a, Eq b, Eq c, Eq d, Eq e, Eq f, Eq g, Eq h, Eq i, Eq j, Eq k, Eq l) => Eq1 (T13 a b c d e f g h i j k l) where
+  liftEq = liftEq2 (==)
+
+-- | @since 0.1.5
+instance (Eq a, Eq b, Eq c, Eq d, Eq e, Eq f, Eq g, Eq h, Eq i, Eq j, Eq k) => Eq2 (T13 a b c d e f g h i j k) where
+  liftEq2 e1 e2 (T13 a b c d e f g h i j k l m) (T13 a' b' c' d' e' f' g' h' i' j' k' l' m') =
+    a == a' && b == b' && c == c' && d == d' && e == e' && f == f' && g == g' && h == h' && i == i' && j == j' && k == k' && e1 l l' && e2 m m'
 
 -- | @since 0.1.3
 instance
