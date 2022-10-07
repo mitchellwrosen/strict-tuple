@@ -14,8 +14,8 @@ where
 
 import Control.DeepSeq (NFData, rnf)
 import Data.Functor.Classes (Eq1 (liftEq), Eq2 (liftEq2))
-import Data.Biapplicative
 import Data.Bifoldable
+import Data.Bifunctor
 import Data.Bitraversable
 import Data.Hashable (Hashable, hash, hashWithSalt)
 import Data.Hashable.Lifted
