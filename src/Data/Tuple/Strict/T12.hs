@@ -13,8 +13,8 @@ module Data.Tuple.Strict.T12
 where
 
 import Control.DeepSeq (NFData, rnf)
-import Data.Biapplicative
 import Data.Bifoldable
+import Data.Bifunctor
 import Data.Bitraversable
 import Data.Functor.Classes (Eq1 (liftEq), Eq2 (liftEq2))
 import Data.Hashable (Hashable, hash, hashWithSalt)
